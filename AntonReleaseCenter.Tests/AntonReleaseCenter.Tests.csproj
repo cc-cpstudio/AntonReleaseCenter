@@ -20,7 +20,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="10.0.10" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\AntonReleaseCenter.Core\AntonReleaseCenter.Core.csproj" />
+    <ProjectReference Include="..\AntonReleaseCenter.Server\AntonReleaseCenter.Server.csproj" />
   </ItemGroup>
 
 </Project>

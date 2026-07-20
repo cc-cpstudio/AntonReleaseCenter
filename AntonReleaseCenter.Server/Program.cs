@@ -9,8 +9,8 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+builder.Services.AddReleaseCenterServices();
 
 string connStr =  builder.Configuration.GetConnectionString("PostgresDb");
 builder.Services.AddDbContext<AppDbContext>(options =>

@@ -1,0 +1,10 @@
+global using AntonReleaseCenter.Core.DTOs;
+global using AntonReleaseCenter.Core.Models;
+global using AntonReleaseCenter.Core.Services;
+global using AntonReleaseCenter.Server.DbContexts;
+global using AntonReleaseCenter.Server.Extensions;
+global using AntonReleaseCenter.Server.Services;
+global using Microsoft.AspNetCore.Authorization;
+global using Microsoft.AspNetCore.Mvc;
+global using Microsoft.EntityFrameworkCore;
+global using Version = AntonReleaseCenter.Core.Models.Version;
