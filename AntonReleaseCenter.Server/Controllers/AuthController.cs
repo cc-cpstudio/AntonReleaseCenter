@@ -56,4 +56,50 @@ public class AuthController : ControllerBase
 
         return Ok(new { token = jwtToken });
     }
+
+    [HttpPost("validate-token")]
+    public IActionResult ValidateToken([FromBody] TokenRequest request)
+    {
+        var jwt = _configuration.GetSection("Jwt");
+        var secretKey = Encoding.UTF8.GetBytes(jwt["SecretKey"]!);
+
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var validationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidIssuer = jwt["Issuer"],
+            ValidateAudience = true,
+            ValidAudience = jwt["Audience"],
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(secretKey),
+            ValidateLifetime = true,
+            ClockSkew = TimeSpan.Zero
+        };
+
+        try
+        {
+            var principal = tokenHandler.ValidateToken(request.Token, validationParameters, out var validatedToken);
+            var jwtToken = (JwtSecurityToken)validatedToken;
+
+            return Ok(new
+            {
+                isValid = true,
+                username = principal.FindFirst(ClaimTypes.Name)?.Value,
+                expires = jwtToken.ValidTo
+            });
+        }
+        catch (SecurityTokenExpiredException)
+        {
+            return Ok(new { isValid = false, message = "Token has expired" });
+        }
+        catch (SecurityTokenException)
+        {
+            return Ok(new { isValid = false, message = "Invalid token" });
+        }
+    }
+}
+
+public class TokenRequest
+{
+    public string Token { get; set; } = string.Empty;
 }
