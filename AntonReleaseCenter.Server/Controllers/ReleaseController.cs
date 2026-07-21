@@ -17,6 +17,13 @@ public class ReleaseController : ControllerBase
         return await _service.GetReleasesBySoftwareIdAsync(softwareId, channelId);
     }
 
+    [HttpGet("software/{softwareName}/releases/{platform}")]
+    public async Task<ActionResult<List<SoftwareRelease>>> GetBySoftwareNameAndPlatform(
+        string softwareName, PlatformEnum platform)
+    {
+        return await _service.GetReleasesBySoftwareNameAndPlatformAsync(softwareName, platform);
+    }
+
     [HttpGet("releases/{id}")]
     public async Task<ActionResult<SoftwareRelease>> GetById(Guid id)
     {

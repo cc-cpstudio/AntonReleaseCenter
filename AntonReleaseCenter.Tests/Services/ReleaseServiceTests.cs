@@ -162,7 +162,7 @@ public class ReleaseServiceTests
         var version = new Version(1, 0, 0, 0);
 
         var release = await service.CreateReleaseAsync(new CreateReleaseRequest(
-            software.SoftwareId, channel.ChannelId, version,
+            software.SoftwareId, channel.ChannelId, PlatformEnum.Windows_x64, version,
             "First release", "/path/file.zip", 1024, "abc123",
             false, true));
 
@@ -181,7 +181,7 @@ public class ReleaseServiceTests
         var channel = await service.CreateChannelAsync(software.SoftwareId,
             new CreateChannelRequest(1, "Stable", 100));
         var release = await service.CreateReleaseAsync(new CreateReleaseRequest(
-            software.SoftwareId, channel.ChannelId, new Version(1, 0, 0, 0),
+            software.SoftwareId, channel.ChannelId, PlatformEnum.Windows_x64, new Version(1, 0, 0, 0),
             "log", "/path.zip", 1024, "hash", false, true));
 
         var toggled = await service.ToggleReleaseOnlineAsync(release.SoftwareReleaseId);
@@ -192,6 +192,27 @@ public class ReleaseServiceTests
         var toggledBack = await service.ToggleReleaseOnlineAsync(release.SoftwareReleaseId);
         Assert.NotNull(toggledBack);
         Assert.True(toggledBack.IsOnline);
+    }
+
+    [Fact]
+    public async Task GetReleasesBySoftwareNameAndPlatformAsync_ReturnsFiltered()
+    {
+        var db = CreateDbContext(nameof(GetReleasesBySoftwareNameAndPlatformAsync_ReturnsFiltered));
+        var service = CreateService(db);
+        var software = await service.CreateSoftwareAsync(new CreateSoftwareRequest("myapp", "MyApp", "desc", true));
+        var channel = await service.CreateChannelAsync(software.SoftwareId,
+            new CreateChannelRequest(1, "Stable", 100));
+        await service.CreateReleaseAsync(new CreateReleaseRequest(
+            software.SoftwareId, channel.ChannelId, PlatformEnum.Windows_x64, new Version(1, 0, 0, 0),
+            "win64", "/path.zip", 1024, "hash", false, true));
+        await service.CreateReleaseAsync(new CreateReleaseRequest(
+            software.SoftwareId, channel.ChannelId, PlatformEnum.MacOS_AppleSilicon, new Version(1, 0, 0, 0),
+            "mac", "/path.zip", 1024, "hash", false, true));
+
+        var result = await service.GetReleasesBySoftwareNameAndPlatformAsync("myapp", PlatformEnum.Windows_x64);
+
+        Assert.Single(result);
+        Assert.Equal(PlatformEnum.Windows_x64, result[0].Platform);
     }
 
     // ===== Check Update Tests =====
@@ -228,7 +249,7 @@ public class ReleaseServiceTests
         var channel = await service.CreateChannelAsync(software.SoftwareId,
             new CreateChannelRequest(1, "Stable", 100));
         await service.CreateReleaseAsync(new CreateReleaseRequest(
-            software.SoftwareId, channel.ChannelId, new Version(2, 0, 0, 0),
+            software.SoftwareId, channel.ChannelId, PlatformEnum.Windows_x64, new Version(2, 0, 0, 0),
             "offline", "/path.zip", 1024, "hash", false, false));
 
         var result = await service.CheckUpdateAsync("key", 1, new Version(1, 0, 0, 0), null);
@@ -246,7 +267,7 @@ public class ReleaseServiceTests
         var channel = await service.CreateChannelAsync(software.SoftwareId,
             new CreateChannelRequest(1, "Stable", 100));
         await service.CreateReleaseAsync(new CreateReleaseRequest(
-            software.SoftwareId, channel.ChannelId, new Version(1, 0, 0, 0),
+            software.SoftwareId, channel.ChannelId, PlatformEnum.Windows_x64, new Version(1, 0, 0, 0),
             "latest", "/path.zip", 1024, "hash", false, true));
 
         var result = await service.CheckUpdateAsync("key", 1, new Version(1, 0, 0, 0), null);
@@ -264,7 +285,7 @@ public class ReleaseServiceTests
         var channel = await service.CreateChannelAsync(software.SoftwareId,
             new CreateChannelRequest(1, "Stable", 100));
         await service.CreateReleaseAsync(new CreateReleaseRequest(
-            software.SoftwareId, channel.ChannelId, new Version(2, 0, 0, 0),
+            software.SoftwareId, channel.ChannelId, PlatformEnum.Windows_x64, new Version(2, 0, 0, 0),
             "New version!", "/path/v2.zip", 2048, "hash2", true, true));
 
         var result = await service.CheckUpdateAsync("key", 1, new Version(1, 0, 0, 0), null);
@@ -285,7 +306,7 @@ public class ReleaseServiceTests
         var channel = await service.CreateChannelAsync(software.SoftwareId,
             new CreateChannelRequest(1, "Beta", 50));
         await service.CreateReleaseAsync(new CreateReleaseRequest(
-            software.SoftwareId, channel.ChannelId, new Version(2, 0, 0, 0),
+            software.SoftwareId, channel.ChannelId, PlatformEnum.Windows_x64, new Version(2, 0, 0, 0),
             "beta", "/path.zip", 1024, "hash", false, true));
 
         var deviceId = "device-in-range";
@@ -311,7 +332,7 @@ public class ReleaseServiceTests
         var channel = await service.CreateChannelAsync(software.SoftwareId,
             new CreateChannelRequest(1, "Stable", 100));
         await service.CreateReleaseAsync(new CreateReleaseRequest(
-            software.SoftwareId, channel.ChannelId, new Version(3, 0, 0, 0),
+            software.SoftwareId, channel.ChannelId, PlatformEnum.Windows_x64, new Version(3, 0, 0, 0),
             "forced update", "/path.zip", 1024, "hash", true, true));
 
         var result = await service.CheckUpdateAsync("key", 1, new Version(1, 0, 0, 0), null);

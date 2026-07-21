@@ -4,6 +4,7 @@ public record SoftwareRelease(
     Guid SoftwareReleaseId,
     Guid SoftwareId,
     Guid ChannelId,
+    PlatformEnum Platform,
     Version Version,
     string UpdateLog,
     string FilePath,
