@@ -13,14 +13,22 @@ const serverUrl = instance?.appContext.config.globalProperties.$serverUrl as str
 const loading = ref(false)
 const loginForm = reactive({
   username: '',
-  passwordHash: '',
+  password: '',
 })
 const rules = {
   username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
-  passwordHash: [{ required: true, message: '请输入密码', trigger: 'blur' }],
+  password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
 }
 
 const formRef = ref()
+
+async function sha256(message: string): Promise<string> {
+  const encoder = new TextEncoder()
+  const data = encoder.encode(message)
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data)
+  const hashArray = Array.from(new Uint8Array(hashBuffer))
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('')
+}
 
 async function handleLogin() {
   const valid = await formRef.value?.validate().catch(() => false)
@@ -28,9 +36,10 @@ async function handleLogin() {
 
   loading.value = true
   try {
+    const passwordHash = await sha256(loginForm.password)
     const response = await axios.post(`${serverUrl}/Auth/login`, {
       username: loginForm.username,
-      passwordHash: loginForm.passwordHash,
+      passwordHash,
     })
     Cookies.set('jwt_token', response.data.token, { expires: 7 })
     ElMessage.success('登录成功')
@@ -66,9 +75,9 @@ async function handleLogin() {
             prefix-icon="User"
           />
         </el-form-item>
-        <el-form-item prop="passwordHash">
+        <el-form-item prop="password">
           <el-input
-            v-model="loginForm.passwordHash"
+            v-model="loginForm.password"
             type="password"
             placeholder="密码"
             size="large"
