@@ -15,6 +15,7 @@ public class PublicController : ControllerBase
     public async Task<ActionResult<CheckUpdateResponse>> CheckUpdate(
         [FromQuery] string appKey,
         [FromQuery] int channelCode,
+        [FromQuery] PlatformEnum platform,
         [FromQuery] string currentVersion,
         [FromQuery] string? deviceId)
     {
@@ -24,7 +25,7 @@ public class PublicController : ControllerBase
         if (!TryParseVersion(currentVersion, out var version))
             return BadRequest("Invalid version format. Expected: Major.Minor.Build.Revision");
 
-        var result = await _service.CheckUpdateAsync(appKey, channelCode, version, deviceId);
+        var result = await _service.CheckUpdateAsync(appKey, channelCode, platform, version, deviceId);
         if (result is null)
             return NotFound("Software or channel not found");
 

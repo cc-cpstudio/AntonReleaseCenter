@@ -223,7 +223,7 @@ public class ReleaseServiceTests
         var db = CreateDbContext(nameof(CheckUpdateAsync_SoftwareNotFound_ReturnsNull));
         var service = CreateService(db);
 
-        var result = await service.CheckUpdateAsync("non-existent", 1, new Version(1, 0, 0, 0), null);
+        var result = await service.CheckUpdateAsync("non-existent", 1, PlatformEnum.Windows_x64, new Version(1, 0, 0, 0), null);
 
         Assert.Null(result);
     }
@@ -235,7 +235,7 @@ public class ReleaseServiceTests
         var service = CreateService(db);
         await service.CreateSoftwareAsync(new CreateSoftwareRequest("key", "App", "desc", true));
 
-        var result = await service.CheckUpdateAsync("key", 999, new Version(1, 0, 0, 0), null);
+        var result = await service.CheckUpdateAsync("key", 999, PlatformEnum.Windows_x64, new Version(1, 0, 0, 0), null);
 
         Assert.Null(result);
     }
@@ -252,7 +252,7 @@ public class ReleaseServiceTests
             software.SoftwareId, channel.ChannelId, PlatformEnum.Windows_x64, new Version(2, 0, 0, 0),
             "offline", "/path.zip", 1024, "hash", false, false));
 
-        var result = await service.CheckUpdateAsync("key", 1, new Version(1, 0, 0, 0), null);
+        var result = await service.CheckUpdateAsync("key", 1, PlatformEnum.Windows_x64, new Version(1, 0, 0, 0), null);
 
         Assert.NotNull(result);
         Assert.False(result.HasUpdate);
@@ -270,7 +270,7 @@ public class ReleaseServiceTests
             software.SoftwareId, channel.ChannelId, PlatformEnum.Windows_x64, new Version(1, 0, 0, 0),
             "latest", "/path.zip", 1024, "hash", false, true));
 
-        var result = await service.CheckUpdateAsync("key", 1, new Version(1, 0, 0, 0), null);
+        var result = await service.CheckUpdateAsync("key", 1, PlatformEnum.Windows_x64, new Version(1, 0, 0, 0), null);
 
         Assert.NotNull(result);
         Assert.False(result.HasUpdate);
@@ -288,7 +288,7 @@ public class ReleaseServiceTests
             software.SoftwareId, channel.ChannelId, PlatformEnum.Windows_x64, new Version(2, 0, 0, 0),
             "New version!", "/path/v2.zip", 2048, "hash2", true, true));
 
-        var result = await service.CheckUpdateAsync("key", 1, new Version(1, 0, 0, 0), null);
+        var result = await service.CheckUpdateAsync("key", 1, PlatformEnum.Windows_x64, new Version(1, 0, 0, 0), null);
 
         Assert.NotNull(result);
         Assert.True(result.HasUpdate);
@@ -310,7 +310,7 @@ public class ReleaseServiceTests
             "beta", "/path.zip", 1024, "hash", false, true));
 
         var deviceId = "device-in-range";
-        var result = await service.CheckUpdateAsync("key", 1, new Version(1, 0, 0, 0), deviceId);
+        var result = await service.CheckUpdateAsync("key", 1, PlatformEnum.Windows_x64, new Version(1, 0, 0, 0), deviceId);
 
         var hash = Math.Abs(deviceId.GetHashCode()) % 100;
         if (hash < 50)
@@ -335,7 +335,7 @@ public class ReleaseServiceTests
             software.SoftwareId, channel.ChannelId, PlatformEnum.Windows_x64, new Version(3, 0, 0, 0),
             "forced update", "/path.zip", 1024, "hash", true, true));
 
-        var result = await service.CheckUpdateAsync("key", 1, new Version(1, 0, 0, 0), null);
+        var result = await service.CheckUpdateAsync("key", 1, PlatformEnum.Windows_x64, new Version(1, 0, 0, 0), null);
 
         Assert.NotNull(result);
         Assert.True(result.IsForceUpdate);

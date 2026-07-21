@@ -22,5 +22,23 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<SoftwareRelease>()
             .Property(r => r.Version)
             .HasConversion(versionConverter);
+
+        modelBuilder.Entity<Channel>()
+            .HasOne<Software>()
+            .WithMany()
+            .HasForeignKey(c => c.SoftwareId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<SoftwareRelease>()
+            .HasOne<Software>()
+            .WithMany()
+            .HasForeignKey(r => r.SoftwareId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<SoftwareRelease>()
+            .HasOne<Channel>()
+            .WithMany()
+            .HasForeignKey(r => r.ChannelId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

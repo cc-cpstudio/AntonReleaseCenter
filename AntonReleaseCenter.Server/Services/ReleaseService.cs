@@ -218,7 +218,7 @@ public class ReleaseService : IReleaseService
     // ===== Client Check Update =====
 
     public async Task<CheckUpdateResponse?> CheckUpdateAsync(
-        string appKey, int channelCode, Version currentVersion, string? deviceId)
+        string appKey, int channelCode, PlatformEnum platform, Version currentVersion, string? deviceId)
     {
         var software = await _db.Software.FirstOrDefaultAsync(s => s.AppKey == appKey);
         if (software is null) return null;
@@ -230,6 +230,7 @@ public class ReleaseService : IReleaseService
         var latestRelease = await _db.SoftwareReleases
             .Where(r => r.SoftwareId == software.SoftwareId
                      && r.ChannelId == channel.ChannelId
+                     && r.Platform == platform
                      && r.IsOnline)
             .OrderByDescending(r => r.ReleaseTime)
             .FirstOrDefaultAsync();
