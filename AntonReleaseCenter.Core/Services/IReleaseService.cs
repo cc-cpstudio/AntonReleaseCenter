@@ -26,5 +26,5 @@ public interface IReleaseService
     Task<SoftwareRelease?> ToggleReleaseOnlineAsync(Guid id);
 
     // Client check update
-    Task<CheckUpdateResponse?> CheckUpdateAsync(string appKey, int channelCode, Version currentVersion, string? deviceId);
+    Task<CheckUpdateResponse?> CheckUpdateAsync(string appKey, int channelCode, PlatformEnum platform, Version currentVersion, string? deviceId);
 }

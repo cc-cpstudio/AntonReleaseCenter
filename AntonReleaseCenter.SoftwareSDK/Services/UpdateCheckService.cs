@@ -1,6 +1,7 @@
 using System.Net;
 using System.Text.Json;
 using AntonReleaseCenter.Core.DTOs;
+using AntonReleaseCenter.Core.Models;
 using AntonReleaseCenter.SoftwareSDK.Model;
 
 namespace AntonReleaseCenter.SoftwareSDK.Services;
@@ -13,15 +14,18 @@ public sealed class UpdateCheckService(HttpClient httpClient, Configure configur
     public async Task<CheckUpdateResponse?> CheckUpdateAsync(
         string currentVersion,
         int channelCode = 0,
+        PlatformEnum? platform = null,
         string? deviceId = null,
         CancellationToken ct = default)
     {
         var effectiveChannelCode = channelCode != 0 ? channelCode : _configure.ChannelCode;
+        var effectivePlatform = platform ?? _configure.Platform;
 
         var queryParameters = new List<string>
         {
             $"appKey={WebUtility.UrlEncode(_configure.SoftwareKey)}",
             $"channelCode={effectiveChannelCode}",
+            $"platform={effectivePlatform}",
             $"currentVersion={WebUtility.UrlEncode(currentVersion)}"
         };
 
