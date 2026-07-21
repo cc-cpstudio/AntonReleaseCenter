@@ -11,7 +11,7 @@ public sealed class UpdateCheckService(HttpClient httpClient, Configure configur
 
     public async Task<SoftwareRelease?> GetLatestRelease()
     {
-        var result = await _httpClient.GetAsync($"{_configure.Url}/software/{_configure.SoftwareId}/releases");
+        var result = await _httpClient.GetAsync($"{_configure.Url}/software/{_configure.SoftwareId}/releases/{_configure.Platform}");
         result.EnsureSuccessStatusCode();
         var json = await result.Content.ReadAsStringAsync();
         var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };

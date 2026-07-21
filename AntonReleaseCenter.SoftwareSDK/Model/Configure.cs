@@ -6,4 +6,5 @@ public record Configure
 {
     public required string Url { get; init; }
     public required Guid SoftwareId { get; init; }
+    public required PlatformEnum Platform { get; init; }
 }
