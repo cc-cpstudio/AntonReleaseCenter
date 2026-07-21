@@ -26,6 +26,7 @@
   <ItemGroup>
     <ProjectReference Include="..\AntonReleaseCenter.Core\AntonReleaseCenter.Core.csproj" />
     <ProjectReference Include="..\AntonReleaseCenter.Server\AntonReleaseCenter.Server.csproj" />
+    <ProjectReference Include="..\AntonReleaseCenter.SoftwareSDK\AntonReleaseCenter.SoftwareSDK.csproj" />
   </ItemGroup>
 
 </Project>
