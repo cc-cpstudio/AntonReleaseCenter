@@ -207,23 +207,47 @@ public class UpdateCheckServiceTests
     // ===== 异常场景 =====
 
     [Fact]
-    public async Task CheckUpdateAsync_ServerError_ThrowsHttpRequestException()
+    public async Task CheckUpdateAsync_ServerError_ThrowsUpdateCheckException()
     {
         var handler = CreateHandler(HttpStatusCode.InternalServerError);
         var service = CreateService(handler);
 
-        await Assert.ThrowsAsync<HttpRequestException>(
+        var ex = await Assert.ThrowsAsync<UpdateCheckException>(
             () => service.CheckUpdateAsync("1.0.0.0"));
+        Assert.Contains("服务器错误", ex.Message);
     }
 
     [Fact]
-    public async Task CheckUpdateAsync_Unauthorized_ThrowsHttpRequestException()
+    public async Task CheckUpdateAsync_Unauthorized_ThrowsUpdateCheckException()
     {
         var handler = CreateHandler(HttpStatusCode.Unauthorized);
         var service = CreateService(handler);
 
-        await Assert.ThrowsAsync<HttpRequestException>(
+        var ex = await Assert.ThrowsAsync<UpdateCheckException>(
             () => service.CheckUpdateAsync("1.0.0.0"));
+        Assert.Contains("认证失败", ex.Message);
+    }
+
+    [Fact]
+    public async Task CheckUpdateAsync_Forbidden_ThrowsUpdateCheckException()
+    {
+        var handler = CreateHandler(HttpStatusCode.Forbidden);
+        var service = CreateService(handler);
+
+        var ex = await Assert.ThrowsAsync<UpdateCheckException>(
+            () => service.CheckUpdateAsync("1.0.0.0"));
+        Assert.Contains("权限不足", ex.Message);
+    }
+
+    [Fact]
+    public async Task CheckUpdateAsync_BadRequest_ThrowsUpdateCheckException()
+    {
+        var handler = CreateHandler(HttpStatusCode.BadRequest);
+        var service = CreateService(handler);
+
+        var ex = await Assert.ThrowsAsync<UpdateCheckException>(
+            () => service.CheckUpdateAsync("1.0.0.0"));
+        Assert.Contains("请求参数错误", ex.Message);
     }
 
     [Fact]

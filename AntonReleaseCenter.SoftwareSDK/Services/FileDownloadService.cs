@@ -3,7 +3,7 @@ using Downloader;
 
 namespace AntonReleaseCenter.SoftwareSDK.Services;
 
-public sealed class FileDownloadService(HttpClient httpClient)
+public sealed class FileDownloadService
 {
     public async Task DownloadRelease(SoftwareRelease release, string fileLocation, IProgress<double> progress, CancellationToken ct = default)
     {

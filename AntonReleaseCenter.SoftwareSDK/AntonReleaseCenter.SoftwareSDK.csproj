@@ -12,6 +12,7 @@
 
     <ItemGroup>
       <PackageReference Include="Downloader" Version="5.9.5" />
+      <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.8" />
     </ItemGroup>
 
 </Project>

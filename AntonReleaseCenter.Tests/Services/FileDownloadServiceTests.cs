@@ -7,8 +7,7 @@ public class FileDownloadServiceTests
 {
     private static FileDownloadService CreateService()
     {
-        var httpClient = new HttpClient();
-        return new FileDownloadService(httpClient);
+        return new FileDownloadService();
     }
 
     private static SoftwareRelease CreateRelease(string filePath = "https://example.com/file.zip")
