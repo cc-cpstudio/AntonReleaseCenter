@@ -194,6 +194,27 @@ public class ReleaseServiceTests
         Assert.True(toggledBack.IsOnline);
     }
 
+    [Fact]
+    public async Task GetReleasesBySoftwareNameAndPlatformAsync_ReturnsFiltered()
+    {
+        var db = CreateDbContext(nameof(GetReleasesBySoftwareNameAndPlatformAsync_ReturnsFiltered));
+        var service = CreateService(db);
+        var software = await service.CreateSoftwareAsync(new CreateSoftwareRequest("myapp", "MyApp", "desc", true));
+        var channel = await service.CreateChannelAsync(software.SoftwareId,
+            new CreateChannelRequest(1, "Stable", 100));
+        await service.CreateReleaseAsync(new CreateReleaseRequest(
+            software.SoftwareId, channel.ChannelId, PlatformEnum.Windows_x64, new Version(1, 0, 0, 0),
+            "win64", "/path.zip", 1024, "hash", false, true));
+        await service.CreateReleaseAsync(new CreateReleaseRequest(
+            software.SoftwareId, channel.ChannelId, PlatformEnum.MacOS_AppleSilicon, new Version(1, 0, 0, 0),
+            "mac", "/path.zip", 1024, "hash", false, true));
+
+        var result = await service.GetReleasesBySoftwareNameAndPlatformAsync("myapp", PlatformEnum.Windows_x64);
+
+        Assert.Single(result);
+        Assert.Equal(PlatformEnum.Windows_x64, result[0].Platform);
+    }
+
     // ===== Check Update Tests =====
 
     [Fact]

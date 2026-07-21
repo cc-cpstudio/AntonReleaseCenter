@@ -124,6 +124,15 @@ public class ReleaseService : IReleaseService
         return await query.OrderByDescending(r => r.ReleaseTime).ToListAsync();
     }
 
+    public async Task<List<SoftwareRelease>> GetReleasesBySoftwareNameAndPlatformAsync(string softwareName, PlatformEnum platform)
+    {
+        return await _db.SoftwareReleases
+            .Where(r => _db.Software.Any(s => s.SoftwareId == r.SoftwareId && s.AppKey == softwareName)
+                     && r.Platform == platform)
+            .OrderByDescending(r => r.ReleaseTime)
+            .ToListAsync();
+    }
+
     public async Task<SoftwareRelease?> GetReleaseByIdAsync(Guid id)
     {
         return await _db.SoftwareReleases.FindAsync(id);

@@ -18,6 +18,7 @@ public interface IReleaseService
 
     // Release
     Task<List<SoftwareRelease>> GetReleasesBySoftwareIdAsync(Guid softwareId, Guid? channelId);
+    Task<List<SoftwareRelease>> GetReleasesBySoftwareNameAndPlatformAsync(string softwareName, PlatformEnum platform);
     Task<SoftwareRelease?> GetReleaseByIdAsync(Guid id);
     Task<SoftwareRelease> CreateReleaseAsync(CreateReleaseRequest request);
     Task<SoftwareRelease?> UpdateReleaseAsync(Guid id, UpdateReleaseRequest request);
