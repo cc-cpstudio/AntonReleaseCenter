@@ -3,6 +3,7 @@ import { ref, onMounted, getCurrentInstance } from 'vue'
 import Cookies from 'js-cookie'
 import axios from 'axios'
 import router from "../router";
+import ThemeToggle from "../components/ThemeToggle.vue";
 
 const jwtTokenAvailable = ref(false)
 const username = ref('')
@@ -31,6 +32,9 @@ onMounted(async () => {
 
 <template>
   <div class="main-container">
+    <div class="theme-toggle-wrapper">
+      <ThemeToggle />
+    </div>
     <div v-if="jwtTokenAvailable" class="content">
       <p class="title">您好，{{ username }}</p>
       <el-button class="button" type="primary" size="large" round @click="router.push('/release')">
@@ -56,10 +60,17 @@ onMounted(async () => {
   flex-direction: column;
   margin: 0;
   overflow: hidden;
+  position: relative;
 }
 
 .main-container p {
   margin-bottom: 24px;
+}
+
+.theme-toggle-wrapper {
+  position: absolute;
+  top: 16px;
+  right: 16px;
 }
 
 .content {
