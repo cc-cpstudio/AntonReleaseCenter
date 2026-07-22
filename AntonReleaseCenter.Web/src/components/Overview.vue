@@ -11,6 +11,7 @@ import type { Release } from "../types/Release"
 import type { Channel } from "../types/Channel"
 import type { SoftwareStatus } from "../types/SoftwareStatus"
 import type { RecentReleaseItem } from "../types/RecentReleaseItem"
+import { versionToString } from "../types/Version"
 
 const emit = defineEmits<{
   selectSoftware: [softwareId: string]
@@ -51,7 +52,7 @@ const recentReleases = computed<RecentReleaseItem[]>(() => {
   )
   return sorted.slice(0, 10).map((r) => ({
     softwareName: softwareNameMap.value[r.softwareId] ?? r.softwareId,
-    version: r.version,
+    version: versionToString(r.version),
     platform: r.platform,
     updateLog: r.updateLog,
     releaseTime: r.releaseTime,
@@ -71,7 +72,7 @@ const softwareStatusList = computed<SoftwareStatus[]>(() => {
       name: sw.name,
       description: sw.description,
       isEnabled: sw.isEnabled,
-      latestVersion: sorted.length > 0 ? sorted[0].version : "",
+      latestVersion: sorted.length > 0 ? versionToString(sorted[0].version) : "",
       latestReleaseTime: sorted.length > 0 ? sorted[0].releaseTime : "",
       releaseCount: swReleases.length,
       onlineCount: swReleases.filter((r) => r.isOnline).length,

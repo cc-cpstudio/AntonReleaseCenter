@@ -43,7 +43,7 @@ const truncateLog = (log: string, maxLen: number = 40) => {
 </script>
 
 <template>
-  <el-card shadow="hover">
+  <el-card shadow="hover" class="recent-releases-card">
     <template #header>
       <span>最近发布记录</span>
     </template>
@@ -75,3 +75,10 @@ const truncateLog = (log: string, maxLen: number = 40) => {
     </el-table>
   </el-card>
 </template>
+
+<style scoped>
+.recent-releases-card {
+  flex: 1;
+  min-width: 320px;
+}
+</style>

@@ -1,9 +1,11 @@
+import type {Version} from "./Version.ts";
+
 export interface Release {
   softwareReleaseId: string
   softwareId: string
   channelId: string
   platform: number
-  version: string
+  version: Version
   updateLog: string
   filePath: string
   fileSize: number
