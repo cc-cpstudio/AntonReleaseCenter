@@ -25,7 +25,7 @@ const username = ref('')
 const currentMenuIndex = ref('__overview')
 
 const loadSoftwareList = async () => {
-  const response = await axios.get(`${serverUrl}/software`)
+  const response = await axios.get(`${serverUrl}/api/software`)
   softwareList.value = (response.data || []).map((item: { softwareId: any; appKey: any; name: any; description: any; isEnabled: any; }) => {
     return {
       uuid: item.softwareId,
