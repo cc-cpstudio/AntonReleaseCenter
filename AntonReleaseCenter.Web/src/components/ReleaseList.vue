@@ -3,29 +3,8 @@
 import axios from "axios";
 import {getCurrentInstance, ref, watch} from "vue";
 import ReleaseItem from "./ReleaseItem.vue";
-
-interface Software {
-  uuid: string
-  appKey: string
-  name: string
-  description: string
-  isEnabled: boolean
-}
-
-interface Release {
-  releaseUuid: string
-  softwareUuid: string
-  channelUuid: string
-  platform: number
-  version: string
-  updateLog: string
-  filePath: string
-  fileSize: number
-  fileHash: string
-  isForceUpdate: boolean
-  releaseTime: string
-  isOnline: boolean
-}
+import type { Software } from "../types/Software"
+import type { Release } from "../types/Release"
 
 const instance = getCurrentInstance()
 const serverUrl = instance?.appContext.config.globalProperties.$serverUrl as string
@@ -44,7 +23,7 @@ const loadSoftware = async () => {
   const res = await axios.get(`${serverUrl}/api/software/${props.softwareUuid}`)
   const data = res.data
   software.value = {
-    uuid: data.softwareId,
+    softwareId: data.softwareId,
     appKey: data.appKey,
     name: data.name,
     description: data.description,
@@ -56,9 +35,9 @@ const loadReleases = async () => {
   const res = await axios.get(`${serverUrl}/api/software/${props.softwareUuid}/releases`)
   const data = res.data
   releases.value = (data || []).map((item: any) => ({
-    releaseUuid: item.softwareReleaseId,
-    softwareUuid: item.softwareId,
-    channelUuid: item.channelId,
+    softwareReleaseId: item.softwareReleaseId,
+    softwareId: item.softwareId,
+    channelId: item.channelId,
     platform: item.platform,
     version: item.version,
     updateLog: item.updateLog,
@@ -96,7 +75,7 @@ watch(() => props.softwareUuid, (newVal) => {
       </div>
     </div>
     <el-scrollbar wrap-style="display: flex; flex-direction: column; gap: 16px;">
-      <ReleaseItem v-for="item in releases" :releaseUuid="item.releaseUuid"/>
+      <ReleaseItem v-for="item in releases" :releaseUuid="item.softwareReleaseId"/>
     </el-scrollbar>
   </div>
 </template>

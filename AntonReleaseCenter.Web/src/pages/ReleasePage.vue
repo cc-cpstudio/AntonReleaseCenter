@@ -8,14 +8,7 @@ import router from "../router";
 import ThemeToggle from "../components/ThemeToggle.vue";
 import Overview from "../components/Overview.vue";
 import ReleaseList from "../components/ReleaseList.vue";
-
-interface Software {
-  uuid: string
-  appKey: string
-  name: string
-  description: string
-  isEnabled: boolean
-}
+import type { Software } from "../types/Software"
 
 const instance = getCurrentInstance()
 const serverUrl = instance?.appContext.config.globalProperties.$serverUrl as string
@@ -26,15 +19,13 @@ const currentMenuIndex = ref('__overview')
 
 const loadSoftwareList = async () => {
   const response = await axios.get(`${serverUrl}/api/software`)
-  softwareList.value = (response.data || []).map((item: { softwareId: any; appKey: any; name: any; description: any; isEnabled: any; }) => {
-    return {
-      uuid: item.softwareId,
-      appKey: item.appKey,
-      name: item.name,
-      description: item.description,
-      isEnabled: item.isEnabled,
-    }
-  })
+  softwareList.value = (response.data || []).map((item: { softwareId: any; appKey: any; name: any; description: any; isEnabled: any; }) => ({
+    softwareId: item.softwareId,
+    appKey: item.appKey,
+    name: item.name,
+    description: item.description,
+    isEnabled: item.isEnabled,
+  }))
 }
 
 const loadUserInfo = async () => {
@@ -99,7 +90,7 @@ onMounted(() => {
               <el-icon><House /></el-icon>
               <span>概览</span>
             </el-menu-item>
-            <el-menu-item v-for="item in softwareList" :index="item.uuid">
+            <el-menu-item v-for="item in softwareList" :index="item.softwareId">
               <el-icon><Menu /></el-icon>
               <span>{{ item.name }}</span>
             </el-menu-item>

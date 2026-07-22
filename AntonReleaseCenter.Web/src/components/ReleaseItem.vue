@@ -3,21 +3,7 @@
 import {getCurrentInstance, ref} from "vue";
 import axios from "axios";
 import {Edit} from "@element-plus/icons-vue";
-
-interface Release {
-  releaseUuid: string
-  softwareUuid: string
-  channelUuid: string
-  platform: number
-  version: string
-  updateLog: string
-  filePath: string
-  fileSize: number
-  fileHash: string
-  isForceUpdate: boolean
-  releaseTime: string
-  isOnline: boolean
-}
+import type { Release } from "../types/Release"
 
 const instance = getCurrentInstance()
 const serverUrl = instance?.appContext.config.globalProperties.$serverUrl as string
@@ -35,9 +21,9 @@ const loadRelease = async () => {
   const res = await axios.get(`${serverUrl}/api/releases/${props.releaseUuid}`)
   const data = res.data
   release.value = {
-    releaseUuid: data.releaseId,
-    softwareUuid: data.softwareId,
-    channelUuid: data.channelId,
+    softwareReleaseId: data.releaseId,
+    softwareId: data.softwareId,
+    channelId: data.channelId,
     platform: data.platform,
     version: data.version,
     updateLog: data.updateLog,

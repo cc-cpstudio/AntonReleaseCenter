@@ -1,16 +1,6 @@
 <script setup lang="ts">
 
-interface SoftwareStatus {
-  softwareId: string
-  name: string
-  description: string
-  isEnabled: boolean
-  latestVersion: string
-  latestReleaseTime: string
-  releaseCount: number
-  onlineCount: number
-  channelCount: number
-}
+import type { SoftwareStatus } from "../../types/SoftwareStatus"
 
 defineProps<{
   softwareList: SoftwareStatus[]

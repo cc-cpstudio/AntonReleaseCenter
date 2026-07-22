@@ -1,35 +1,11 @@
 <script setup lang="ts">
 
-
-interface ReleaseItem {
-  softwareName: string
-  version: string
-  platform: number
-  updateLog: string
-  releaseTime: string
-  isOnline: boolean
-}
+import type { RecentReleaseItem } from "../../types/RecentReleaseItem"
+import { platformLabel } from "../../types/platformLabel"
 
 const props = defineProps<{
-  releases: ReleaseItem[]
+  releases: RecentReleaseItem[]
 }>()
-
-const platformLabel: Record<number, string> = {
-  0: "Windows x64",
-  1: "Windows x86",
-  2: "Windows Arm64",
-  3: "macOS Intel",
-  4: "macOS AppleSilicon",
-  5: "Linux AppImage x64",
-  6: "Linux AppImage x86",
-  7: "Linux AppImage Arm64",
-  8: "Linux Debian x64",
-  9: "Linux Debian x86",
-  10: "Linux Debian Arm64",
-  11: "Linux RedHat x64",
-  12: "Linux RedHat x86",
-  13: "Linux RedHat Arm64",
-}
 
 const formatTime = (time: string) => {
   if (!time) return "-"
