@@ -71,8 +71,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div>
-    <el-container>
+  <el-container style="height: 100vh">
       <el-header class="header-bar">
         <div class="header-left">
           <span class="project-name">AntonReleaseCenter</span>
@@ -93,9 +92,9 @@ onMounted(() => {
           <ThemeToggle />
         </div>
       </el-header>
-      <el-container>
+      <el-container style="flex: 1; overflow: hidden;">
         <el-aside width="200px">
-          <el-menu style="width: 100%" @select="handleMenuSelect">
+          <el-menu style="width: 100%" :default-active="currentMenuIndex" @select="handleMenuSelect">
             <el-menu-item index="__overview">
               <el-icon><House /></el-icon>
               <span>概览</span>
@@ -107,12 +106,15 @@ onMounted(() => {
           </el-menu>
         </el-aside>
         <el-main>
-          <Overview v-if="currentMenuIndex == '__overview'"/>
-          <ReleaseList v-else :softwareUuid="currentMenuIndex"/>
+          <el-scrollbar style="height: 100%;">
+            <div style="overflow: hidden; margin: 16px">
+              <Overview v-if="currentMenuIndex == '__overview'" @select-software="handleMenuSelect"/>
+              <ReleaseList v-else :softwareUuid="currentMenuIndex"/>
+            </div>
+          </el-scrollbar>
         </el-main>
       </el-container>
     </el-container>
-  </div>
 </template>
 
 <style scoped>
