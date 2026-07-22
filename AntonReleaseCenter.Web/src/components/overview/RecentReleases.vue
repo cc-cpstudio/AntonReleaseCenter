@@ -1,17 +1,9 @@
 <script setup lang="ts">
 
-
-interface ReleaseItem {
-  softwareName: string
-  version: string
-  platform: number
-  updateLog: string
-  releaseTime: string
-  isOnline: boolean
-}
+import type { RecentReleaseItem } from "../../types/RecentReleaseItem"
 
 const props = defineProps<{
-  releases: ReleaseItem[]
+  releases: RecentReleaseItem[]
 }>()
 
 const platformLabel: Record<number, string> = {

@@ -6,62 +6,15 @@ import StatCard from "./overview/StatCard.vue"
 import PlatformChart from "./overview/PlatformChart.vue"
 import RecentReleases from "./overview/RecentReleases.vue"
 import SoftwareStatusTable from "./overview/SoftwareStatusTable.vue"
+import type { Software } from "../types/Software"
+import type { Release } from "../types/Release"
+import type { Channel } from "../types/Channel"
+import type { SoftwareStatus } from "../types/SoftwareStatus"
+import type { RecentReleaseItem } from "../types/RecentReleaseItem"
 
 const emit = defineEmits<{
   selectSoftware: [softwareId: string]
 }>()
-
-interface Software {
-  softwareId: string
-  appKey: string
-  name: string
-  description: string
-  isEnabled: boolean
-}
-
-interface Release {
-  softwareReleaseId: string
-  softwareId: string
-  channelId: string
-  platform: number
-  version: string
-  updateLog: string
-  filePath: string
-  fileSize: number
-  fileHash: string
-  isForceUpdate: boolean
-  releaseTime: string
-  isOnline: boolean
-}
-
-interface Channel {
-  channelId: string
-  softwareId: string
-  channelCode: string
-  channelName: string
-  grayScalePercent: number
-}
-
-interface SoftwareStatus {
-  softwareId: string
-  name: string
-  description: string
-  isEnabled: boolean
-  latestVersion: string
-  latestReleaseTime: string
-  releaseCount: number
-  onlineCount: number
-  channelCount: number
-}
-
-interface RecentReleaseItem {
-  softwareName: string
-  version: string
-  platform: number
-  updateLog: string
-  releaseTime: string
-  isOnline: boolean
-}
 
 const instance = getCurrentInstance()
 const serverUrl = instance?.appContext.config.globalProperties.$serverUrl as string
