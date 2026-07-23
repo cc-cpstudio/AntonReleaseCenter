@@ -242,7 +242,6 @@ onMounted(() => {
             <span>{{ username }}</span>
           </span>
           <el-link :underline="false" @click="logout">
-            <el-icon><SwitchButton /></el-icon>
             <span>退出登录</span>
           </el-link>
           <ThemeToggle />
