@@ -22,4 +22,8 @@
       <ProjectReference Include="..\AntonReleaseCenter.Core\AntonReleaseCenter.Core.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="wwwroot\" />
+    </ItemGroup>
+
 </Project>
