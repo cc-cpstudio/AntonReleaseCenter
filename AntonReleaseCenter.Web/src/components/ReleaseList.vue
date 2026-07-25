@@ -162,8 +162,7 @@ const submitCreate = async () => {
     if (createFile.value) {
       formData.append('file', createFile.value)
     }
-
-    await axios.post(`${serverUrl}/api/releases`, formData, {
+    await axios.post(`${serverUrl}/api/software/${props.softwareUuid}/releases`, formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
     })
     ElMessage.success('发布创建成功')
