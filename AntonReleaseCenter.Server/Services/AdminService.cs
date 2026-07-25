@@ -58,4 +58,19 @@ public class AdminService : IAdminService
         await _db.SaveChangesAsync();
         return true;
     }
+
+    public async Task<bool> ChangePasswordAsync(Guid adminId, string oldPasswordHash, string newPasswordHash)
+    {
+        var admin = await _db.Admins.FindAsync(adminId);
+        if (admin is null) return false;
+        if (admin.PasswordHash != oldPasswordHash) return false;
+
+        _db.Admins.Entry(admin).CurrentValues.SetValues(new Admin(
+            adminId,
+            admin.Username,
+            newPasswordHash
+        ));
+        await _db.SaveChangesAsync();
+        return true;
+    }
 }

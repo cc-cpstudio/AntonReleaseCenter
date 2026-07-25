@@ -14,3 +14,8 @@ public record AdminResponse(
     Guid AdminId,
     string Username
 );
+
+public record ChangePasswordRequest(
+    string OldPasswordHash,
+    string NewPasswordHash
+);

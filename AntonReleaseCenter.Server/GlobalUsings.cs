@@ -4,6 +4,7 @@ global using AntonReleaseCenter.Core.Services;
 global using AntonReleaseCenter.Server.DbContexts;
 global using AntonReleaseCenter.Server.Extensions;
 global using AntonReleaseCenter.Server.Services;
+global using System.Security.Claims;
 global using Microsoft.AspNetCore.Authorization;
 global using Microsoft.AspNetCore.Mvc;
 global using Microsoft.EntityFrameworkCore;

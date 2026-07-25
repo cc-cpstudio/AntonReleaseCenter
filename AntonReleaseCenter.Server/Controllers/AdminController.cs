@@ -48,4 +48,16 @@ public class AdminController : ControllerBase
         if (!deleted) return NotFound();
         return NoContent();
     }
+
+    [HttpPost("change-password")]
+    public async Task<ActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
+    {
+        var adminIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (adminIdClaim is null || !Guid.TryParse(adminIdClaim, out var adminId))
+            return Unauthorized();
+
+        var success = await _service.ChangePasswordAsync(adminId, request.OldPasswordHash, request.NewPasswordHash);
+        if (!success) return BadRequest("旧密码错误或用户不存在");
+        return NoContent();
+    }
 }

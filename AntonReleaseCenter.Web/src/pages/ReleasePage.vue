@@ -1,7 +1,8 @@
 <script setup lang="ts">
 
-import {House, Menu, SwitchButton, UserFilled} from "@element-plus/icons-vue";
+import {House, Menu, UserFilled} from "@element-plus/icons-vue";
 import axios from "axios";
+import {ElMessage} from "element-plus";
 import {getCurrentInstance, onMounted, ref} from "vue";
 import Cookies from "js-cookie";
 import router from "../router";
@@ -45,6 +46,30 @@ const channelForm = ref({
   grayScalePercent: 100,
 })
 const channelFormRef = ref()
+
+async function sha256(message: string): Promise<string> {
+  const encoder = new TextEncoder()
+  const data = encoder.encode(message)
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data)
+  const hashArray = Array.from(new Uint8Array(hashBuffer))
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('')
+}
+
+const adminTableData = ref<{ adminId: string; username: string }[]>([])
+const adminLoading = ref(false)
+const adminSaving = ref(false)
+const editingAdminId = ref<string | null>(null)
+const adminForm = ref({ username: '', password: '' })
+const adminFormRef = ref()
+
+const passwordForm = ref({ oldPassword: '', newPassword: '', confirmPassword: '' })
+const passwordSaving = ref(false)
+const passwordFormRef = ref()
+const passwordRules = {
+  oldPassword: [{ required: true, message: '请输入当前密码', trigger: 'blur' }],
+  newPassword: [{ required: true, message: '请输入新密码', trigger: 'blur' }, { min: 6, message: '密码至少6位', trigger: 'blur' }],
+  confirmPassword: [{ required: true, message: '请确认新密码', trigger: 'blur' }],
+}
 
 const loadSoftwareList = async () => {
   const response = await axios.get(`${serverUrl}/api/software`)
@@ -218,6 +243,109 @@ const submitChannelForm = async () => {
   }
 }
 
+const loadAdminTable = async () => {
+  adminLoading.value = true
+  try {
+    const response = await axios.get(`${serverUrl}/api/admin`)
+    adminTableData.value = response.data || []
+  } catch {
+    adminTableData.value = []
+  } finally {
+    adminLoading.value = false
+  }
+}
+
+const resetAdminForm = () => {
+  editingAdminId.value = null
+  adminForm.value = { username: '', password: '' }
+  adminFormRef.value?.resetFields()
+}
+
+const handleAdminEdit = (row: { adminId: string; username: string }) => {
+  editingAdminId.value = row.adminId
+  adminForm.value = { username: row.username, password: '' }
+}
+
+const handleAdminDelete = async (row: { adminId: string }) => {
+  try {
+    await axios.delete(`${serverUrl}/api/admin/${row.adminId}`)
+    await loadAdminTable()
+    ElMessage.success('删除成功')
+  } catch {
+    ElMessage.error('删除失败')
+  }
+}
+
+const submitAdminForm = async () => {
+  if (!adminForm.value.username) {
+    ElMessage.warning('请输入用户名')
+    return
+  }
+  if (!adminForm.value.password) {
+    ElMessage.warning('请输入密码')
+    return
+  }
+  adminSaving.value = true
+  try {
+    const passwordHash = await sha256(adminForm.value.password)
+    if (editingAdminId.value) {
+      await axios.put(`${serverUrl}/api/admin/${editingAdminId.value}`, {
+        username: adminForm.value.username,
+        passwordHash,
+      })
+    } else {
+      await axios.post(`${serverUrl}/api/admin`, {
+        username: adminForm.value.username,
+        passwordHash,
+      })
+    }
+    await loadAdminTable()
+    resetAdminForm()
+    ElMessage.success(editingAdminId.value ? '修改成功' : '添加成功')
+  } catch {
+    ElMessage.error('操作失败')
+  } finally {
+    adminSaving.value = false
+  }
+}
+
+const resetPasswordForm = () => {
+  passwordForm.value = { oldPassword: '', newPassword: '', confirmPassword: '' }
+  passwordFormRef.value?.resetFields()
+}
+
+const submitChangePassword = async () => {
+  const valid = await passwordFormRef.value?.validate().catch(() => false)
+  if (!valid) return
+  if (passwordForm.value.newPassword !== passwordForm.value.confirmPassword) {
+    ElMessage.error('两次输入的新密码不一致')
+    return
+  }
+  passwordSaving.value = true
+  try {
+    const oldHash = await sha256(passwordForm.value.oldPassword)
+    const newHash = await sha256(passwordForm.value.newPassword)
+    await axios.post(`${serverUrl}/api/admin/change-password`, {
+      oldPasswordHash: oldHash,
+      newPasswordHash: newHash,
+    })
+    ElMessage.success('密码修改成功')
+    resetPasswordForm()
+  } catch (error: any) {
+    const message = error.response?.data || '密码修改失败'
+    ElMessage.error(message)
+  } finally {
+    passwordSaving.value = false
+  }
+}
+
+const openSettingsDialog = () => {
+  loadAdminTable()
+  resetPasswordForm()
+  resetAdminForm()
+  settingsDialogVisible.value = true
+}
+
 loadSoftwareList()
 
 onMounted(() => {
@@ -235,7 +363,7 @@ onMounted(() => {
         <div class="header-right">
           <el-link :underline="false" @click="openSoftwareDialog">软件</el-link>
           <el-link :underline="false" @click="openChannelDialog">渠道</el-link>
-          <el-link :underline="false" @click="settingsDialogVisible = true">设置</el-link>
+          <el-link :underline="false" @click="openSettingsDialog">设置</el-link>
           <el-link :underline="false" @click="aboutDialogVisible = true">关于</el-link>
           <span class="header-username">
             <el-icon><UserFilled /></el-icon>
@@ -394,7 +522,52 @@ onMounted(() => {
       </template>
     </el-dialog>
 
-    <el-dialog v-model="settingsDialogVisible" title="设置" width="500px" :close-on-click-modal="false">
+    <el-dialog v-model="settingsDialogVisible" title="设置" width="750px" :close-on-click-modal="false">
+      <el-tabs>
+        <el-tab-pane label="修改密码">
+          <el-form ref="passwordFormRef" :model="passwordForm" :rules="passwordRules" label-width="100px" style="max-width: 420px;">
+            <el-form-item label="当前密码" prop="oldPassword">
+              <el-input v-model="passwordForm.oldPassword" type="password" show-password />
+            </el-form-item>
+            <el-form-item label="新密码" prop="newPassword">
+              <el-input v-model="passwordForm.newPassword" type="password" show-password />
+            </el-form-item>
+            <el-form-item label="确认密码" prop="confirmPassword">
+              <el-input v-model="passwordForm.confirmPassword" type="password" show-password />
+            </el-form-item>
+            <el-form-item>
+              <el-button type="primary" :loading="passwordSaving" @click="submitChangePassword">修改密码</el-button>
+            </el-form-item>
+          </el-form>
+        </el-tab-pane>
+        <el-tab-pane label="管理员管理">
+          <div style="margin-bottom: 16px;">
+            <el-form ref="adminFormRef" :model="adminForm" inline>
+              <el-form-item label="用户名">
+                <el-input v-model="adminForm.username" style="width: 160px;" />
+              </el-form-item>
+              <el-form-item label="密码">
+                <el-input v-model="adminForm.password" type="password" show-password style="width: 160px;" />
+              </el-form-item>
+              <el-form-item>
+                <el-button type="primary" :loading="adminSaving" @click="submitAdminForm">
+                  {{ editingAdminId ? '保存' : '新增' }}
+                </el-button>
+                <el-button v-if="editingAdminId" @click="resetAdminForm">取消编辑</el-button>
+              </el-form-item>
+            </el-form>
+          </div>
+          <el-table :data="adminTableData" stripe size="small" v-loading="adminLoading">
+            <el-table-column prop="username" label="用户名" min-width="200" />
+            <el-table-column label="操作" width="160">
+              <template #default="{ row }">
+                <el-button type="primary" size="small" @click="handleAdminEdit(row)">编辑</el-button>
+                <el-button type="danger" size="small" @click="handleAdminDelete(row)">删除</el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+        </el-tab-pane>
+      </el-tabs>
       <template #footer>
         <el-button type="primary" @click="settingsDialogVisible = false">关闭</el-button>
       </template>

@@ -138,4 +138,67 @@ public class AdminServiceTests
 
         Assert.False(deleted);
     }
+
+    [Fact]
+    public async Task ChangePasswordAsync_ValidCredentials_ReturnsTrue()
+    {
+        var db = CreateDbContext(nameof(ChangePasswordAsync_ValidCredentials_ReturnsTrue));
+        var service = CreateService(db);
+        var created = await service.CreateAdminAsync(new CreateAdminRequest("admin", "old_hash"));
+
+        var result = await service.ChangePasswordAsync(created.AdminId, "old_hash", "new_hash");
+
+        Assert.True(result);
+    }
+
+    [Fact]
+    public async Task ChangePasswordAsync_ValidCredentials_UpdatesPasswordHash()
+    {
+        var db = CreateDbContext(nameof(ChangePasswordAsync_ValidCredentials_UpdatesPasswordHash));
+        var service = CreateService(db);
+        var created = await service.CreateAdminAsync(new CreateAdminRequest("admin", "old_hash"));
+
+        await service.ChangePasswordAsync(created.AdminId, "old_hash", "new_hash");
+
+        var admin = await db.Admins.FindAsync(created.AdminId);
+        Assert.NotNull(admin);
+        Assert.Equal("new_hash", admin.PasswordHash);
+    }
+
+    [Fact]
+    public async Task ChangePasswordAsync_WrongOldPassword_ReturnsFalse()
+    {
+        var db = CreateDbContext(nameof(ChangePasswordAsync_WrongOldPassword_ReturnsFalse));
+        var service = CreateService(db);
+        var created = await service.CreateAdminAsync(new CreateAdminRequest("admin", "correct_hash"));
+
+        var result = await service.ChangePasswordAsync(created.AdminId, "wrong_hash", "new_hash");
+
+        Assert.False(result);
+    }
+
+    [Fact]
+    public async Task ChangePasswordAsync_WrongOldPassword_DoesNotUpdateHash()
+    {
+        var db = CreateDbContext(nameof(ChangePasswordAsync_WrongOldPassword_DoesNotUpdateHash));
+        var service = CreateService(db);
+        var created = await service.CreateAdminAsync(new CreateAdminRequest("admin", "correct_hash"));
+
+        await service.ChangePasswordAsync(created.AdminId, "wrong_hash", "new_hash");
+
+        var admin = await db.Admins.FindAsync(created.AdminId);
+        Assert.NotNull(admin);
+        Assert.Equal("correct_hash", admin.PasswordHash);
+    }
+
+    [Fact]
+    public async Task ChangePasswordAsync_NonExistingAdmin_ReturnsFalse()
+    {
+        var db = CreateDbContext(nameof(ChangePasswordAsync_NonExistingAdmin_ReturnsFalse));
+        var service = CreateService(db);
+
+        var result = await service.ChangePasswordAsync(Guid.NewGuid(), "old", "new");
+
+        Assert.False(result);
+    }
 }
