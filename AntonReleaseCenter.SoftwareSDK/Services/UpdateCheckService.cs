@@ -32,7 +32,7 @@ public sealed class UpdateCheckService(HttpClient httpClient, Configure configur
         if (!string.IsNullOrEmpty(deviceId))
             queryParameters.Add($"deviceId={WebUtility.UrlEncode(deviceId)}");
 
-        var url = $"{_configure.Url}/public/check-update?{string.Join("&", queryParameters)}";
+        var url = $"{_configure.Url}/api/public/check-update?{string.Join("&", queryParameters)}";
 
         var result = await _httpClient.GetAsync(url, ct);
         if (result.StatusCode == HttpStatusCode.NotFound)

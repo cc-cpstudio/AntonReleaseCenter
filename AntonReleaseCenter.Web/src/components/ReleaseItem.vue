@@ -57,7 +57,7 @@ const loadRelease = async () => {
     version: data.version,
     updateLog: data.updateLog,
     filePath: data.filePath,
-    fileSize: data.filesize,
+    fileSize: data.fileSize,
     fileHash: data.fileHash,
     isForceUpdate: data.isForceUpdate,
     releaseTime: data.releaseTime,
