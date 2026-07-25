@@ -472,7 +472,7 @@ onMounted(() => {
             <el-input v-model="channelForm.channelName" style="width: 120px;" />
           </el-form-item>
           <el-form-item label="灰度百分比">
-            <el-input-number v-model="channelForm.grayScalePercent" :min="0" :max="100" style="width: 100px;" />
+            <el-input-number v-model="channelForm.grayScalePercent" :min="0" :max="100" style="width: 120px;" />
           </el-form-item>
           <el-form-item>
             <el-button
@@ -498,7 +498,7 @@ onMounted(() => {
         <el-table-column prop="channelCode" label="渠道号" width="100" />
         <el-table-column prop="channelName" label="渠道名" min-width="160" />
         <el-table-column label="灰度百分比" width="120">
-          <template #default="{ row }">
+          <template #default="{ row }"> 
             {{ row.grayScalePercent }}%
           </template>
         </el-table-column>
