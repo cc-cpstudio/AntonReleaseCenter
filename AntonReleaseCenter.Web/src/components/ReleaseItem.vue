@@ -2,8 +2,8 @@
 
 import {getCurrentInstance, ref} from "vue";
 import axios from "axios";
-import { ElMessage } from "element-plus";
-import {Edit} from "@element-plus/icons-vue";
+import { ElMessage, ElMessageBox } from "element-plus";
+import {Delete, Edit} from "@element-plus/icons-vue";
 import type { Release } from "../types/Release"
 import type { Channel } from "../types/Channel"
 import { versionToString } from "../types/Version"
@@ -25,6 +25,7 @@ const release = ref<Release | null>(null)
 const channels = ref<Channel[]>([])
 
 const editing = ref(false)
+const deleting = ref(false)
 const editDialogVisible = ref(false)
 const editFormRef = ref()
 const editForm = ref({
@@ -135,6 +136,29 @@ const submitEdit = async () => {
   }
 }
 
+const handleDelete = async () => {
+  try {
+    await ElMessageBox.confirm(
+      '确定要删除该发布吗？此操作不可撤销，关联的文件也将被删除。',
+      '删除确认',
+      { confirmButtonText: '确定删除', cancelButtonText: '取消', type: 'warning' }
+    )
+  } catch {
+    return
+  }
+
+  deleting.value = true
+  try {
+    await axios.delete(`${serverUrl}/api/releases/${props.releaseUuid}`)
+    ElMessage.success('删除成功')
+    emit('refresh')
+  } catch {
+    ElMessage.error('删除失败')
+  } finally {
+    deleting.value = false
+  }
+}
+
 const editFormRules = {
   platform: [{ required: true, message: '请选择平台', trigger: 'change' }],
   channelId: [{ required: true, message: '请选择渠道', trigger: 'change' }],
@@ -158,10 +182,16 @@ loadRelease()
         <el-tag type="primary">支持平台：{{ platformLabel[release.platform] }}</el-tag>
       </div>
       <el-text truncated line-clamp="1">{{ release.updateLog }}</el-text>
-      <el-button round @click="openEditDialog">
-        <el-icon><Edit /></el-icon>
-        编辑
-      </el-button>
+      <div class="release-actions">
+        <el-button round @click="openEditDialog">
+          <el-icon><Edit /></el-icon>
+          编辑
+        </el-button>
+        <el-button round type="danger" :loading="deleting" @click="handleDelete">
+          <el-icon><Delete /></el-icon>
+          删除
+        </el-button>
+      </div>
     </div>
   </el-card>
 
@@ -226,5 +256,12 @@ loadRelease()
   flex-direction: row;
   justify-content: space-between;
   align-content: center;
+}
+
+.release-actions {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+  flex-shrink: 0;
 }
 </style>
